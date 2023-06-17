@@ -1,12 +1,16 @@
 const { createProduct, getAllProduct, editProductById, deleteProductById, getProductById } = require('./product.dao');
 const { errorResponse, successResponse } = require('../../utils/responseHandler');
 const ApiFeatures = require('../../utils/apiFeatures');
+const Product = require('../../models/productModel');
 
 
 // Create Product ---- Admin
 
 const addProduct = async (req, res) => {
     try {
+
+        req.body.user = req.user.id;
+
         let data = req.body;
 
         if (!data) return res.status(422).send(errorResponse('Unprocessable Entity'));
@@ -28,13 +32,21 @@ const addProduct = async (req, res) => {
 const getProducts = async (req, res) => {
     try {
 
-        const apiFeature = new ApiFeatures(getAllProduct(),req.query).search().filter();
+        const resultPerPage = 5;
+        const productCount = await Product.countDocuments();
+
+        const apiFeature = new ApiFeatures
+            (getAllProduct(), req.query)
+            .search()
+            .filter()
+            .pagination(resultPerPage)
+            ;
 
         const products = await apiFeature.query;
 
         if (!products) return res.status(404).send(errorResponse('Products Not Found'))
 
-        return res.status(200).send(successResponse('Fetched Successfully', { products }))
+        return res.status(200).send(successResponse('Fetched Successfully', { products, productCount }))
 
     } catch (e) {
 
@@ -81,7 +93,7 @@ const updateProduct = async (req, res) => {
 
         if (!product) return res.status(204).send(errorResponse('Updation Failed'));
 
-        return res.status(202).send(successResponse('Updated Successfully',{ product }))
+        return res.status(202).send(successResponse('Updated Successfully', { product }))
 
     } catch (e) {
 
