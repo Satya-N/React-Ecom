@@ -7,10 +7,10 @@ const {isAuthenticatedUser, authorizeRole } = require('../middleware/auth');
 //Routes
 
 router.get('/products', isAuthenticatedUser, getProducts);
-router.post('/addProduct', isAuthenticatedUser,authorizeRole("admin"), addProduct);
+router.post('/admin/product/new', isAuthenticatedUser,authorizeRole("admin"), addProduct);
 router.get('/product/:productId', getProductDetail);
-router.patch('/product/:productId', isAuthenticatedUser,authorizeRole("admin"), updateProduct);
-router.delete('/product/:productId', isAuthenticatedUser,authorizeRole("admin"), deleteProduct);
+router.patch('/admin/product/:productId', isAuthenticatedUser,authorizeRole("admin"), updateProduct);
+router.delete('/admin/product/:productId', isAuthenticatedUser,authorizeRole("admin"), deleteProduct);
 
 
 
