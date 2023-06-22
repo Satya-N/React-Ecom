@@ -13,11 +13,15 @@ const getProductById = (productId) => {
 }
 
 const editProductById = ( productId, productObj ) => {
-    return product.findByIdAndUpdate( productId, productObj, {new: true} )
+    return product.findByIdAndUpdate( productId, productObj, {new: true, runValidators: true} )
 }
 
 const deleteProductById = ( productId ) => {
     return product.findByIdAndDelete( productId );
+}
+
+const getReviews = (productId) => {
+    return product.findById(productId).distinct('reviews');
 }
 
 
@@ -26,5 +30,6 @@ module.exports = {
     getAllProduct,
     getProductById,
     editProductById,
-    deleteProductById
+    deleteProductById,
+    getReviews
 }

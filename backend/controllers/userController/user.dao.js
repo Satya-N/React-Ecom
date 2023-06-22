@@ -16,6 +16,10 @@ const findUserByIdAndUpdate = (userId, newData) => {
     return User.findByIdAndUpdate(userId, newData, { new: true, runValidators: true, useFindAndModify: false });
 }
 
+const findUserByIdAndRemove = (userId) => {
+    return User.findByIdAndRemove(userId);
+}
+
 const findUsers = () => {
     return User.find();
 }
@@ -25,5 +29,6 @@ module.exports = {
     findOneUser,
     findUserById,
     findUserByIdAndUpdate,
-    findUsers
+    findUsers,
+    findUserByIdAndRemove
 }

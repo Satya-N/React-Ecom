@@ -1,4 +1,4 @@
-const { addUser, findOneUser, findUserById, findUserByIdAndUpdate, findUsers } = require('./user.dao');
+const { addUser, findOneUser, findUserById, findUserByIdAndUpdate, findUsers, findUserByIdAndRemove } = require('./user.dao');
 const User = require('../../models/userModel');
 const { successResponse, errorResponse } = require('../../utils/responseHandler');
 const sendToken = require('../../utils/jwtToken');
@@ -117,7 +117,7 @@ const getUserDetails = async (req, res, next) => {
         let user = await findUserById(userId);
         if (!user) return res.status(404).send(errorResponse('User Not Found'));
         user = user._doc
-        return res.status(200).send(successResponse('Fetched Successfully', {user}))
+        return res.status(200).send(successResponse('Fetched Successfully', { user }))
 
     } catch (e) {
         return res.status(500).send(errorResponse(e.message ? e.message : 'Something Went Wrong'));
@@ -136,7 +136,7 @@ const updatePassword = async (req, res, next) => {
         if (newPassword !== confirmPassword) return res.status(400).send(errorResponse('Password Does not Match'));
         user.password = newPassword;
         await user.save();
-        return res.status(200).send(successResponse('Updated Successfully', {user:user._doc}))
+        return res.status(200).send(successResponse('Updated Successfully', { user: user._doc }))
 
     } catch (e) {
         return res.status(500).send(errorResponse(e.message ? e.message : 'Something Went Wrong'));
@@ -152,7 +152,7 @@ const updateUserProfile = async (req, res, next) => {
         }
         const user = await findUserByIdAndUpdate(req.user.id, newUserData);
         if (!user) return res.status(404).send(errorResponse('User Not Found'));
-        return res.status(200).send(successResponse('Updated Successfully', {user:user._doc}))
+        return res.status(200).send(successResponse('Updated Successfully', { user: user._doc }))
     } catch (e) {
         return res.status(500).send(errorResponse(e.message ? e.message : 'Something Went wrong'))
     }
@@ -162,7 +162,7 @@ const getAllUsers = async (req, res, next) => {
     try {
         const users = await findUsers();
         if (!users) return res.status(404).send(errorResponse('No Users Found'));
-        return res.status(200).send(successResponse('Fetched Successfully', {users}));
+        return res.status(200).send(successResponse('Fetched Successfully', { users }));
     } catch (e) {
         return res.status(500).send(errorResponse(e.message ? e.message : 'Something Went Wrong'))
     }
@@ -173,9 +173,40 @@ const getOneUser = async (req, res, next) => {
         const userId = req.params.userId;
         const user = await findUserById(userId);
         if (!user) return res.status().send(errorResponse(`User does not Exist With id ${userId}`));
-        return res.status(200).send(successResponse('Fetched Successfully', {user:user._doc}));
+        return res.status(200).send(successResponse('Fetched Successfully', { user: user._doc }));
     } catch (e) {
         return res.status(500).send(errorResponse(e.message ? e.message : 'Something Went Wrong'))
+    }
+}
+
+//Update User Role - ADMIN
+const updateProfile = async (req, res, next) => {
+    try {
+        const newUserData = {
+            name: req.body.name,
+            email: req.body.email,
+            role: req.body.role
+        }
+        const userId = req.params.userId;
+        const user = await findUserByIdAndUpdate(userId, newUserData);
+        if (!user) return res.status().send(errorResponse(`User does not Exist With id ${userId}`));
+        res.status(200).send(successResponse('Updated Successfully', { user: user._doc }))
+    } catch (e) {
+        return res.status(500).send(errorResponse(e.message ? e.message : 'Something Went Wrong'))
+
+    }
+}
+
+//Delete User - ADMIN
+const deleteUser = async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+        const user = await findUserByIdAndRemove(userId);
+        if (!user) return res.status(400).send(errorResponse('User does not Exist'));
+        res.status(200).send(successResponse('Deleted Successfully'));
+    } catch (e) {
+        return res.status(500).send(errorResponse(e.message ? e.message : 'Something Went Wrong'))
+
     }
 }
 
@@ -191,5 +222,7 @@ module.exports = {
     updatePassword,
     updateUserProfile,
     getAllUsers,
-    getOneUser
+    getOneUser,
+    updateProfile,
+    deleteUser
 }
