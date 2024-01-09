@@ -5,7 +5,7 @@ const createProduct = (data) => {
 }
 
 const getAllProduct = () => {
-    return product.find()
+    return product.find();
 }
 
 const getProductById = (productId) => {
